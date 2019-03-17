@@ -1,12 +1,17 @@
 // HelloWindowsDesktop.cpp
 // compile with: /D_UNICODE /DUNICODE /DWIN32 /D_WINDOWS /c
-
+#ifndef NOMINMAX
+# define NOMINMAX
+#endif
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
 #include <vector>
 #include "Source.h"
+//#include "TestSource.h"
+
+#include <networktables\NetworkTableInstance.h>
 
 // Global variables
 
@@ -17,8 +22,14 @@ static TCHAR szWindowClass[] = _T("DesktopApp");
 static TCHAR szTitle[] = _T("MinDash");
 
 HINSTANCE hInst;
+HWND hWnd;
+void onUpdate() {
+	InvalidateRect(hWnd, NULL, TRUE);
+	MessageBox(hWnd, _T("Blah"), _T("Blah"), NULL);
+	
+}
 
-Source ns;
+Source<int> tsrc;
 
 int ID_TIMER = 5;
 
@@ -31,7 +42,7 @@ void Timerproc(
 	DWORD Arg4
 );
 
-HWND hWnd;
+
 
 int CALLBACK WinMain(
 	_In_ HINSTANCE hInstance,
@@ -40,7 +51,7 @@ int CALLBACK WinMain(
 	_In_ int       nCmdShow
 )
 {
-	WNDCLASSEX wcex;
+	WNDCLASSEX wcex; tsrc.blah(5);
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
@@ -99,6 +110,10 @@ int CALLBACK WinMain(
 		nCmdShow);
 	UpdateWindow(hWnd);
 
+	nt::NetworkTableInstance instance = nt::NetworkTableInstance::GetDefault();
+	instance.StartClient("localhost");
+	
+
 	// Main message loop:
 	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0))
@@ -117,7 +132,7 @@ void Timerproc(
 	DWORD Arg4
 )
 {
-	InvalidateRect(hWnd, NULL, TRUE);
+	//tsrc.doUpdate();
 }
 
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
